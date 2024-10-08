@@ -2,4 +2,4 @@
 
 from Game.functions import load_assets
 
-assets = load_assets("Game/assets", scale=3)
+assets = load_assets("Game/assets")

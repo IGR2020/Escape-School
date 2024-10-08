@@ -123,10 +123,10 @@ class Player(CorePlayer):
         if isinstance(hitbox, pg.Surface):
             self.mask = pg.mask.from_surface(hitbox)
         else:
-            hitbox.x *= scale
-            hitbox.y *= scale
-            hitbox.width *= scale
-            hitbox.height *= scale
+            hitbox[0] *= scale
+            hitbox[1] *= scale
+            hitbox[2] *= scale
+            hitbox[3] *= scale
             image = pg.Surface((self.rect.width, self.rect.height)).convert_alpha()
             image.fill((0, 0, 0, 0))
             image.fill((255, 255, 255, 255), hitbox)
