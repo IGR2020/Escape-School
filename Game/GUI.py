@@ -175,8 +175,6 @@ class TextBox():
             self.selected = True
         elif not self.rect.collidepoint((x, y)) and mouseDown:
             self.selected = False
-            if self.text[-1] == "|":
-                self.text = self.text[:-1]
             self.reload()
 
         return self.selected

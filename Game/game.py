@@ -2,21 +2,26 @@
 from Game.collision import *
 import pygame as pg
 from Game.GUI import *
-from Game.config import ObjectConfig
+from Game.config import BaseConfig, configMap
+from Game.functions import setAssetsToAlpha
+
 
 class CoreGame:
     "The Base Class For All Game Objects"
 
     def __init__(self, resolution: tuple[int, int], fps: int = 60) -> None:
+        global assets
 
         # pygame window config
-        self.height, self.width = resolution
+        self.width, self.height = resolution
         self.window = pg.display.set_mode(resolution)
+
+        # conversion of all assets to alpha
+        assets = setAssetsToAlpha(assets)
 
         self.run = True
         self.clock = pg.time.Clock()
         self.fps = fps
-
 
     def event(self, event):
         if event.type == pg.QUIT:
@@ -49,7 +54,9 @@ class LevelEditor(CoreGame):
                 exec(f"self.objectMap.update({ObjImport}.objectMap)")
             except:
                 print(f"[Objects] Failed to use {ObjImport} (No objectMap)")
-                print("objectMap can be defined as objectMap = {name: object}, do NOT use objectMap = {name: object()}, do not call the init")
+                print(
+                    "objectMap can be defined as objectMap = {name: object}, do NOT use objectMap = {name: object()}, do not call the init"
+                )
                 continue
             print(f"[Objects] Using {ObjImport} objects")
 
@@ -65,20 +72,38 @@ class LevelEditor(CoreGame):
         pressedColor = (100, 100, 100)
         releasedColor = (0, 0, 0)
         for objName in objectMap:
-            text = Text(objName, startX, self.height - fontSize, releasedColor, fontSize, "Arialblack")
-            pressedText = Text(objName, startX, self.height - fontSize, pressedColor, fontSize, "Arialblack")
-            self.buttons.append(Button((startX, 0), text.image, pressedText.image, objName))
+            text = Text(
+                objName,
+                startX,
+                self.height - fontSize,
+                releasedColor,
+                fontSize,
+                "Arialblack",
+            )
+            pressedText = Text(
+                objName,
+                startX,
+                self.height - fontSize,
+                pressedColor,
+                fontSize,
+                "Arialblack",
+            )
+            self.buttons.append(
+                Button((startX, 0), text.image, pressedText.image, objName)
+            )
             startX += text.rect.width
 
-        self.data = {"Button Menu Bottom": fontSize*2}
+        self.data = {"Button Menu Bottom": fontSize * 2}
 
         self.configMenu = None
+
+        self.x_offset, self.y_offset = 0, 0
 
     def display(self):
         self.window.fill((255, 255, 255))
 
         for obj in self.objects:
-            obj.display(self.window)
+            obj.display(self.window, self.x_offset, self.y_offset)
 
         for button in self.buttons:
             button.display(self.window)
@@ -89,10 +114,19 @@ class LevelEditor(CoreGame):
         pg.display.update()
 
     def selectObj(self):
-        for i, obj in enumerate(self.objects):
-            if obj.rect.collidepoint(pg.mouse.get_pos()):
+        x, y = pg.mouse.get_pos()
+        pos = MouseClick(x+self.x_offset, y+self.y_offset)
+        for obj in self.objects:
+            if pg.sprite.collide_mask(obj, pos):
                 self.selectedObj = obj
-                self.configMenu = ObjectConfig(obj, 0, self.data["Button Menu Bottom"])
+                try:
+                    self.configMenu = configMap[obj.type](
+                        obj, 0, self.data["Button Menu Bottom"]
+                    )
+                except:
+                    self.configMenu = BaseConfig(
+                        obj, 0, self.data["Button Menu Bottom"]
+                    )
                 break
 
     def event(self, event):
@@ -102,11 +136,16 @@ class LevelEditor(CoreGame):
         if event.type == pg.MOUSEBUTTONDOWN:
             for button in self.buttons:
                 if button.pressed(event):
-                    self.objects.append(self.objectMap[button.info](self.width/2, self.height/2, "Crate"))
+                    self.objects.append(
+                        self.objectMap[button.info](
+                            self.width / 2, self.height / 2, "Crate"
+                        )
+                    )
                     break
             else:
                 self.selectObj()
         if event.type == pg.MOUSEBUTTONUP:
+            self.selectedObj = None
             for button in self.buttons:
                 button.released()
 
@@ -119,7 +158,6 @@ class LevelEditor(CoreGame):
         if True in mouseDown and self.selectedObj is not None:
             self.selectedObj.rect.x += mouseRelX
             self.selectedObj.rect.y += mouseRelY
-
-
-
-    
+        elif mouseDown[2]:
+            self.x_offset -= mouseRelX
+            self.y_offset -= mouseRelY

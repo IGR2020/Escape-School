@@ -7,13 +7,8 @@ class School(CoreGame):
     "School Environment (level 1)"
 
     def __init__(self, resolution: tuple[int, int], fps: int = 60) -> None:
-        global assets
         super().__init__(resolution, fps)
         pg.display.set_caption("School")
-
-
-        # conversion of all assets to alpha
-        assets = setAssetsToAlpha(assets)
 
         self.player = Player(self.width/2, self.height/2, "Player", pg.Rect(0, 0, 40, 5), scale=4)
         self.objects = []

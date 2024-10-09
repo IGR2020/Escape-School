@@ -23,17 +23,27 @@ def clamp(
 class CoreObject:
 
     def __init__(
-        self, x: int, y: int, name: str, scale: int = 1, angle: int = 0
+        self, x: int, y: int, name: str, scale: int = 1, angle: int = 0, size: tuple[int, int] | list[int, int] = None
     ) -> None:
         self.name = name
-        self.rect = assets[name].get_rect(topleft=(x, y))
+        self.rect: pg.Rect = assets[name].get_rect(topleft=(x, y))
         self.mask = pg.mask.from_surface(assets[name])
         self.scale = scale
         self.angle = angle
+        if size is None:
+            self.size = self.rect.width, self.rect.height
+        else:
+            self.size = size
+        self.size = [self.size[0], self.size[1]]
         self.reload()
+        self.type = "Object"
+
+    def resetSize(self) -> None:
+        self.size = [assets[self.name].get_width(), assets[self.name].get_height()]
 
     def reload(self) -> None:
-        self.scaledImage = pg.transform.scale_by(assets[self.name], self.scale)
+        self.morphedImage = pg.transform.scale(assets[self.name], self.size)
+        self.scaledImage = pg.transform.scale_by(self.morphedImage, self.scale)
         self.rotatedImage = pg.transform.rotate(self.scaledImage, self.angle)
         self.mask = pg.mask.from_surface(self.rotatedImage)
         self.rect = self.rotatedImage.get_rect(center=self.rect.center)
@@ -177,6 +187,14 @@ class Player(CorePlayer):
         self.rotate()
 
         self.setXYFromSpeed()
+
+
+# -----------Mouse Click Collision Object----------- #
+
+
+class MouseClick(Object):
+    def __init__(self, x: int, y: int) -> None:
+        super().__init__(x, y, "Flat Black", 1, 0)
 
 
 # -----------Object Map----------- #
