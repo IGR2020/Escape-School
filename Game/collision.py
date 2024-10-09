@@ -9,6 +9,7 @@ try:
 except:
     assets = {}
 
+# objectMap defined at bottom of file
 
 def clamp(
     minValue: int | float, value: int | float, maxValue: int | float
@@ -176,3 +177,7 @@ class Player(CorePlayer):
         self.rotate()
 
         self.setXYFromSpeed()
+
+
+# -----------Object Map----------- #
+objectMap = {"Object": Object}

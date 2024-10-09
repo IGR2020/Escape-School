@@ -4,6 +4,7 @@ import pygame as pg
 from os import listdir
 from os.path import isfile, isdir, join
 import json
+import pickle
 
 
 def blit_text(
@@ -81,5 +82,21 @@ def load_assets_list(path, size: int = None, scale: float = None):
 def loadJson(path):
     with open(path) as file:
         data = json.load(file)
+        file.close()
+    return data
+
+def setAssetsToAlpha(assets) -> dict[str, pg.Surface]:
+    for asset in assets:
+        assets[asset] = assets[asset].convert_alpha()
+    return assets
+
+def saveData(data, path):
+    with open(path) as file:
+        pickle.dump(data, file)
+        file.close()
+
+def loadData(path):
+    with open(path) as file:
+        data = pickle.load(file)
         file.close()
     return data
