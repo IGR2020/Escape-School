@@ -131,6 +131,21 @@ class LevelEditor(CoreGame):
 
         pg.display.update()
 
+    def keydown(self, event):
+        if event.key == pg.K_DELETE:
+            self.objects.remove(self.selectedObj)
+            self.selectedObj = None
+        if self.selectedObj is None:
+            return
+        if event.key == pg.K_LEFT:
+            self.selectedObj.rect.x -= 1
+        if event.key == pg.K_RIGHT:
+            self.selectedObj.rect.x += 1        
+        if event.key == pg.K_UP:
+            self.selectedObj.rect.y -= 1        
+        if event.key == pg.K_DOWN:
+            self.selectedObj.rect.y += 1
+
     def selectObj(self):
         x, y = pg.mouse.get_pos()
         pos = MouseClick(x+self.x_offset, y+self.y_offset)
@@ -151,7 +166,10 @@ class LevelEditor(CoreGame):
         super().event(event)
         if self.configMenu is not None:
             self.configMenu.event(event)
+        if event.type == pg.KEYDOWN:
+            self.keydown(event)
         if event.type == pg.MOUSEBUTTONDOWN:
+            self.selectedObj = None
             for button in self.buttons:
                 if button.pressed(event):
                     self.objects.append(
@@ -163,7 +181,6 @@ class LevelEditor(CoreGame):
             else:
                 self.selectObj()
         if event.type == pg.MOUSEBUTTONUP:
-            self.selectedObj = None
             for button in self.buttons:
                 button.released()
 
