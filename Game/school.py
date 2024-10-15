@@ -1,17 +1,23 @@
 import pygame as pg
 from Game.collision import * 
-from Game.functions import setAssetsToAlpha
+from Game.functions import setAssetsToAlpha, loadData, saveData
 from Game.game import CoreGame
 
 class School(CoreGame):
     "School Environment (level 1)"
 
-    def __init__(self, resolution: tuple[int, int], fps: int = 60) -> None:
+    def __init__(self, resolution: tuple[int, int], dataLocation: str, fps: int = 60) -> None:
         super().__init__(resolution, fps)
         pg.display.set_caption("School")
 
-        self.player = Player(self.width/2, self.height/2, "Player", pg.Rect(0, 0, 40, 5), scale=4)
-        self.objects = []
+        self.player = Player(self.width/2, self.height/2, "Player", pg.Rect(0, 0, 40, 5), scale=2)
+        self.dataLocation  = dataLocation
+        try:
+            self.objects = loadData(self.dataLocation)
+            for obj in self.objects:
+                obj.unpack()
+        except:
+            self.objects = []
 
         self.x_offset, self.y_offset = 0, 0
 
@@ -29,6 +35,9 @@ class School(CoreGame):
         self.window.fill((255, 255, 255))
 
         self.player.display(self.window, self.x_offset, self.y_offset)
+
+        for obj in self.objects:
+            obj.display(self.window, self.x_offset, self.y_offset)
 
         pg.display.update()
 
