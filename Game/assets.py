@@ -10,5 +10,7 @@ assets.update(load_assets("Game/assets/GUI", scale=GUI_scale))
 assets.update(load_assets("Game/assets/objects"))
 assets["Flat Black"] = pg.Surface((1, 1))
 assets["Flat Black"].fill((0, 0, 0))
+assets["Wall"] = pg.Surface((10, 10))
+assets["Wall"].fill((100, 100, 100))
 
 fontLocation = "Game/assets/fonts/"

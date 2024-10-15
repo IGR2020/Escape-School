@@ -56,6 +56,12 @@ class CoreObject:
     def display(self, window: pg.Surface, x_offset: int = 0, y_offset: int = 0) -> None:
         window.blit(self.rotatedImage, (self.rect.x - x_offset, self.rect.y - y_offset))
 
+    def pack(self):
+        self.morphedImage, self.scaledImage, self.rotatedImage, self.mask = None, None, None, None
+
+    def unpack(self):
+        self.reload()
+
 
 # -----------Base Player Class For All Collision Classes----------- #
 
@@ -132,6 +138,7 @@ class Player(CorePlayer):
         
         # stable collision
         if isinstance(hitbox, pg.Surface):
+            hitbox = pg.transform.scale_by(hitbox, self.scale)
             self.mask = pg.mask.from_surface(hitbox)
         else:
             hitbox[0] *= scale

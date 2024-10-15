@@ -3,7 +3,8 @@ from Game.collision import *
 import pygame as pg
 from Game.GUI import *
 from Game.config import BaseConfig, configMap
-from Game.functions import setAssetsToAlpha
+from Game.functions import setAssetsToAlpha, loadData, saveData
+from time import time
 
 
 class CoreGame:
@@ -26,11 +27,14 @@ class CoreGame:
     def event(self, event):
         if event.type == pg.QUIT:
             self.run = False
+            self.quit()
 
     def tick(self):
         self.clock.tick(self.fps)
 
     def display(self): ...
+
+    def quit(self): ...
 
     def start(self):
         while self.run:
@@ -41,7 +45,7 @@ class CoreGame:
 
 
 class LevelEditor(CoreGame):
-    def __init__(self, resolution: tuple[int, int], fps: int = 60, *imports) -> None:
+    def __init__(self, resolution: tuple[int, int], dataLocation: str, fps: int = 60, *imports) -> None:
         "*imports -> add the names of the modules you want to import from"
 
         self.objectMap = objectMap
@@ -62,7 +66,13 @@ class LevelEditor(CoreGame):
 
         super().__init__(resolution, fps)
         pg.display.set_caption("Level Editor")
-        self.objects = []
+        self.dataLocation  = dataLocation
+        try:
+            self.objects = loadData(self.dataLocation)
+            for obj in self.objects:
+                obj.unpack()
+        except:
+            self.objects = []
         self.selectedObj = None
 
         # creating buttons
@@ -98,6 +108,14 @@ class LevelEditor(CoreGame):
         self.configMenu = None
 
         self.x_offset, self.y_offset = 0, 0
+
+        self.moveCoolDown = 4
+        self.timeSinceMoveCoolDown = 0
+
+    def quit(self):
+        for obj in self.objects:
+            obj.pack()
+        saveData(self.objects, self.dataLocation)
 
     def display(self):
         self.window.fill((255, 255, 255))
@@ -158,6 +176,14 @@ class LevelEditor(CoreGame):
         if True in mouseDown and self.selectedObj is not None:
             self.selectedObj.rect.x += mouseRelX
             self.selectedObj.rect.y += mouseRelY
+            for obj in self.objects:
+                if id(obj) == id(self.selectedObj):
+                    continue
+                if not obj.rect.colliderect(self.selectedObj):
+                    continue
+                if mouseRelX > 1:
+                    self.selectedObj.rect.right = obj.rect.left
+                    self.selectedObj.rect.y = obj.rect.y
         elif mouseDown[2]:
             self.x_offset -= mouseRelX
             self.y_offset -= mouseRelY

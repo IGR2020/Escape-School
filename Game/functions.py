@@ -91,12 +91,12 @@ def setAssetsToAlpha(assets) -> dict[str, pg.Surface]:
     return assets
 
 def saveData(data, path):
-    with open(path) as file:
+    with open(path, "wb") as file:
         pickle.dump(data, file)
         file.close()
 
 def loadData(path):
-    with open(path) as file:
+    with open(path, "rb") as file:
         data = pickle.load(file)
         file.close()
     return data
