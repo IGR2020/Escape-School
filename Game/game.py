@@ -5,7 +5,7 @@ from Game.GUI import *
 from Game.config import BaseConfig, configMap
 from Game.functions import setAssetsToAlpha, loadData, saveData
 from time import time
-
+from copy import deepcopy
 
 class CoreGame:
     "The Base Class For All Game Objects"
@@ -74,6 +74,8 @@ class LevelEditor(CoreGame):
         except:
             self.objects = []
         self.selectedObj = None
+        self.dupeCoolDown = 1
+        self.TSdupeCoolDown = time()
 
         # creating buttons
         self.buttons = []
@@ -193,14 +195,13 @@ class LevelEditor(CoreGame):
         if True in mouseDown and self.selectedObj is not None:
             self.selectedObj.rect.x += mouseRelX
             self.selectedObj.rect.y += mouseRelY
-            for obj in self.objects:
-                if id(obj) == id(self.selectedObj):
-                    continue
-                if not obj.rect.colliderect(self.selectedObj):
-                    continue
-                if mouseRelX > 1:
-                    self.selectedObj.rect.right = obj.rect.left
-                    self.selectedObj.rect.y = obj.rect.y
         elif mouseDown[2]:
             self.x_offset -= mouseRelX
             self.y_offset -= mouseRelY
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LCTRL] and keys[pg.K_d] and self.selectedObj is not None and time() - self.TSdupeCoolDown > self.dupeCoolDown:
+            self.selectedObj.pack()
+            self.objects.append(deepcopy(self.selectedObj))
+            self.objects[-1].unpack()
+            self.selectedObj.unpack()
+            self.TSdupeCoolDown = time()
