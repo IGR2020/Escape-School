@@ -31,6 +31,8 @@ class School(CoreGame):
         self.player.script(self.x_offset, self.y_offset)
         self.player.collide(self.objects)
 
+        self.x_offset, self.y_offset = (self.player.rect.centerx - self.width/2, self.player.rect.centery - self.height/2)
+
     def display(self) -> None:
         self.window.fill((255, 255, 255))
 
