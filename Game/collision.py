@@ -69,6 +69,8 @@ class CoreObject:
 class CorePlayer(CoreObject):
     x_vel, y_vel = 0, 0
     maxSpeed = 5
+    isSitting = False
+    satUp = False
 
     def script(self):
         self.x_vel, self.y_vel = 0, 0
@@ -82,6 +84,14 @@ class CorePlayer(CoreObject):
             self.y_vel += self.maxSpeed       
         if keys[pg.K_d]:
             self.x_vel += self.maxSpeed
+
+    def eventControls(self, event):
+        if not event.type == pg.KEYDOWN:
+            return
+        if event.key == pg.K_LSHIFT:
+            self.satUp = True
+            self.isSitting = not self.isSitting
+        else: self.satUp = False
 
     def collide(self, objects):
         for _ in range(round(abs(self.x_vel))):
@@ -196,6 +206,37 @@ class Player(CorePlayer):
         self.setXYFromSpeed()
 
 
+# -----------Chair (Interactive)----------- #
+
+
+class Chair(Object):
+    def __init__(self, x: int, y: int, name: str, scale: int = 1, angle: int = 0, size: tuple[int, int] | list[int] = None) -> None:
+        super().__init__(x, y, name, scale, angle, size)
+        self.type = "Chair"
+
+    def resolveXCollision(self, player: CorePlayer) -> CorePlayer:
+        if not pg.sprite.collide_mask(self, player):
+            return player
+        if player.isSitting:
+            player.rect.center = self.rect.center
+        elif player.satUp:
+            player.rect.bottom = self.rect.top
+        else:
+            return super().resolveXCollision(player)
+        return player
+
+    def resolveYCollision(self, player: CorePlayer) -> CorePlayer:
+        if player.satUp:
+            player.rect.bottom = self.rect.top
+        if not pg.sprite.collide_mask(self, player):
+            return player
+        if player.isSitting:
+            player.rect.center = self.rect.center
+        else:
+            return super().resolveYCollision(player)
+        return player
+
+
 # -----------Mouse Click Collision Object----------- #
 
 
@@ -205,4 +246,4 @@ class MouseClick(Object):
 
 
 # -----------Object Map----------- #
-objectMap = {"Object": Object}
+objectMap = {"Object": Object, "Chair": Chair}

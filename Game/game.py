@@ -103,7 +103,7 @@ class LevelEditor(CoreGame):
             self.buttons.append(
                 Button((startX, 0), text.image, pressedText.image, objName)
             )
-            startX += text.rect.width
+            startX += text.rect.width + 25
 
         self.data = {"Button Menu Bottom": fontSize * 2}
 

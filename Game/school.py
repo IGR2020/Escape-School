@@ -25,6 +25,8 @@ class School(CoreGame):
     def event(self, event) -> None:
         super().event(event)
 
+        self.player.eventControls(event)
+
     def tick(self) -> None:
         super().tick()
 
@@ -36,9 +38,15 @@ class School(CoreGame):
     def display(self) -> None:
         self.window.fill((255, 255, 255))
 
+        for obj in self.objects:
+            if obj.type == "Chair":
+                obj.display(self.window, self.x_offset, self.y_offset)
+
         self.player.display(self.window, self.x_offset, self.y_offset)
 
         for obj in self.objects:
+            if obj.type == "Chair":
+                continue      
             obj.display(self.window, self.x_offset, self.y_offset)
 
         pg.display.update()
