@@ -10,7 +10,7 @@ class School(CoreGame):
         super().__init__(resolution, fps)
         pg.display.set_caption("School")
 
-        self.player = Player(self.width/2, self.height/2, "Player", pg.Rect(0, 0, 40, 5), scale=2)
+        self.player = Player(self.width/2, self.height/2, "Player", assets["Player Hitbox"], scale=2)
         self.dataLocation  = dataLocation
         try:
             self.objects = loadData(self.dataLocation)

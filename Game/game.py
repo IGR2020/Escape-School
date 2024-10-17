@@ -134,7 +134,7 @@ class LevelEditor(CoreGame):
         pg.display.update()
 
     def keydown(self, event):
-        if event.key == pg.K_DELETE:
+        if event.key == pg.K_DELETE and self.selectedObj is not None:
             self.objects.remove(self.selectedObj)
             self.selectedObj = None
         if self.selectedObj is None:
