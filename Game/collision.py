@@ -237,6 +237,91 @@ class Chair(Object):
         return player
 
 
+# -----------Door (Interactive)----------- #
+
+
+class Door(Object):
+    def __init__(self, x: int, y: int, name: str, scale: int = 1, angle: int = 0, size: tuple[int, int] | list[int] = None) -> None:
+        super().__init__(x, y, name, scale, angle, size)
+        self.orentation = "horizontal"
+        self.iter = 0
+        self.maxSwing = 15
+
+    def resolveXCollision(self, player: CorePlayer) -> CorePlayer:
+        if self.orentation == "horizontal":
+            return super().resolveXCollision(player)
+        while pg.sprite.collide_mask(self, player) and self.iter < self.maxSwing:
+            try:
+                self.angle += (player.x_vel / abs(player.x_vel)) * -1
+            except ZeroDivisionError:
+                break
+            self.iter += 1
+        self.rotate()
+        self.iter = 0
+        return player
+
+    def resolveYCollision(self, player: CorePlayer) -> CorePlayer:
+        if self.orentation == "vertical":
+            return super().resolveYCollision(player)
+        while pg.sprite.collide_mask(self, player) and self.iter < self.maxSwing:
+            try:
+                self.angle += (player.y_vel / abs(player.x_vel)) * -1
+            except ZeroDivisionError:
+                break
+            self.iter += 1
+        
+        self.rotate()
+        self.iter = 0
+        return player
+
+if False:    
+    class Door:
+        def __init__(self, x, y, name) -> None:
+            self.image = assets[name]
+            self.rotatedImage = assets[name]
+            self.rect = self.image.get_rect(topleft=(x, y))
+            self.name = name
+            self.pivot = "topleft"
+            self.orientation = "horizontal"
+            self.angle = 0
+            self.mask = pg.mask.from_surface(self.rotatedImage)
+            self.iter = 0
+            self.maxSwing = 15
+            self.topLev = True
+
+        def display(self, window: pg.Surface):
+            window.blit(self.rotatedImage, self.rect)
+
+        def reload(self):
+            self.rect = self.rotatedImage.get_rect(topleft=self.rect.topleft)
+            self.mask = pg.mask.from_surface(self.rotatedImage)
+
+        def aftScript(self):
+            self.topLev = True
+
+        def script(self, player: Player):
+            if not pg.sprite.collide_mask(self, player) and self.topLev:
+                self.angle += 1
+                self.angle = min(max(self.angle, -90), 0)
+                self.rotatedImage = pg.transform.rotate(self.image, self.angle)
+                self.reload()
+                return
+            elif not pg.sprite.collide_mask(self, player):
+                self.iter = 0
+                return
+            if player.rect.y < self.rect.bottom:
+                self.angle -= 1
+                self.angle = min(max(self.angle, -90), 0)
+                self.rotatedImage = pg.transform.rotate(self.image, self.angle)
+            self.reload()
+            self.iter += 1
+            if self.iter > self.maxSwing:
+                self.iter = 0
+                return
+            self.topLev = False
+            self.script(player)
+            
+
 # -----------Mouse Click Collision Object----------- #
 
 

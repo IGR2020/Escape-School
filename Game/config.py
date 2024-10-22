@@ -79,4 +79,4 @@ class ObjectConfig(BaseConfig):
         self.heightbox.display(window)
         self.heightText.display(window)
 
-configMap = {"Object": ObjectConfig, "Chair": ObjectConfig}
+configMap = {"Object": ObjectConfig, "Chair": ObjectConfig, "Door": ObjectConfig}

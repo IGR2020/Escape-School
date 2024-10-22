@@ -1,6 +1,7 @@
 import Game.game
+import Game.school
 
 if __name__ == "__main__":
-    school = Game.game.LevelEditor((900, 600), "Game/data/test2.pkl")
+    school = Game.school.School((900, 600), "Game/data/test2.pkl")
     school.start()
     
