@@ -1,4 +1,5 @@
 "Core Game Functions & Classes"
+import Game.GUI
 from Game.collision import *
 import pygame as pg
 from Game.GUI import *
@@ -27,7 +28,6 @@ class CoreGame:
     def event(self, event):
         if event.type == pg.QUIT:
             self.run = False
-            self.quit()
 
     def tick(self):
         self.clock.tick(self.fps)
@@ -42,6 +42,40 @@ class CoreGame:
                 self.event(event)
             self.tick()
             self.display()
+        return self.quit()
+
+
+class MainMenu(CoreGame):
+    def __init__(self, resolution: tuple[int, int], fps: int = 60):
+        super().__init__(resolution, fps)
+        self.playButton = Game.GUI.Button((self.width/2, self.height/2), "Play Button", "Play Button Pressed")
+        self.command = "Quit"
+
+    def display(self):
+        self.window.fill((255, 255, 255))
+        self.playButton.display(self.window)
+        pg.display.update()
+
+    def event(self, event):
+        super().event(event)
+        if event.type == pg.MOUSEBUTTONDOWN:
+            if self.playButton.pressed(event):
+                print("[Game] Switching Game Tabs")
+        if event.type == pg.MOUSEBUTTONUP:
+            if self.playButton.released():
+                self.run = False
+                self.command = "Game"
+
+    def tick(self):
+        super().tick()
+        keys = pg.key.get_pressed()
+        if keys[pg.K_LCTRL] and keys[pg.K_c]:
+            self.command = "Editor"
+            self.run = False
+
+    def quit(self):
+        return self.command
+
 
 
 class LevelEditor(CoreGame):

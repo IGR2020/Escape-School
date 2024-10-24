@@ -1,6 +1,6 @@
-"Core Collision Module For Pygame Games"
+"""Core Collision Module For Pygame Games"""
 
-import pygame as pg
+import  pygame as pg
 import math
 
 # Expects all images to be in a single dictionary with string keys
@@ -69,7 +69,7 @@ class CoreObject:
 class CorePlayer(CoreObject):
     x_vel, y_vel = 0, 0
     maxSpeed = 5
-    isSitting = False
+    isSitting = True
     satUp = False
 
     def script(self):
@@ -90,20 +90,19 @@ class CorePlayer(CoreObject):
             return
         if event.key == pg.K_LSHIFT:
             self.satUp = True
-            self.isSitting = not self.isSitting
         else: self.satUp = False
 
     def collide(self, objects):
         for _ in range(round(abs(self.x_vel))):
             self.rect.x += self.x_vel / abs(self.x_vel)
             for obj in objects:
-                self = obj.resolveXCollision(self)
+                obj.resolveXCollision(self)
 
         for _ in range(round(abs(self.y_vel))):
             self.rect.y += self.y_vel / abs(self.y_vel)
             for obj in objects:
-                self = obj.resolveYCollision(self)
-        
+                obj.resolveYCollision(self)
+
 
 # -----------Base Class For All Collision Classes----------- #
 
@@ -138,8 +137,8 @@ class Player(CorePlayer):
     def __init__(self, x: int, y: int, name: str, hitbox: pg.Rect | pg.Surface, correctionAngle: int = 0, scale: int = 1, angle: int = 0) -> None:
         """correctionAngle -> should make it so that when the
         object is rotated by that amount it faces up.\n
-        hitbox -> either a image or a rect which is relative to the x and y,
-        the hitbox will scale automaticaly"""
+        hitbox -> either image or a rect which is relative to the x and y,
+        the hitbox will scale automatically"""
         # code order fix
         self.hitbox = None
 
@@ -274,7 +273,7 @@ class Door(Object):
         self.iter = 0
         return player
 
-if False:    
+if False:
     class Door:
         def __init__(self, x, y, name) -> None:
             self.image = assets[name]
@@ -299,7 +298,7 @@ if False:
         def aftScript(self):
             self.topLev = True
 
-        def script(self, player: Player):
+        def script(self, player: CorePlayer):
             if not pg.sprite.collide_mask(self, player) and self.topLev:
                 self.angle += 1
                 self.angle = min(max(self.angle, -90), 0)
@@ -320,7 +319,7 @@ if False:
                 return
             self.topLev = False
             self.script(player)
-            
+
 
 # -----------Mouse Click Collision Object----------- #
 

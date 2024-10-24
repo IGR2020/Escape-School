@@ -7,7 +7,7 @@ mouseButtonMap = {"left": 1, "middle": 2, "right": 3}
 
 pg.font.init()
 
-class Button():
+class Button:
 
     def __init__(self, pos, releasedImage: str | pg.Surface, pressedImage: str | pg.Surface, *args):
 
