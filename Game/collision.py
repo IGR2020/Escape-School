@@ -1,4 +1,5 @@
 """Core Collision Module For Pygame Games"""
+import time
 
 import  pygame as pg
 import math
@@ -71,6 +72,8 @@ class CorePlayer(CoreObject):
     maxSpeed = 5
     isSitting = True
     satUp = False
+    satUpCoolDown = 0.5
+    timeSinceSatUp = 0
 
     def script(self):
         self.x_vel, self.y_vel = 0, 0
@@ -89,6 +92,7 @@ class CorePlayer(CoreObject):
         if not event.type == pg.KEYDOWN:
             return
         if event.key == pg.K_LSHIFT:
+            self.timeSinceSatUp = time.time()
             self.satUp = True
         else: self.satUp = False
 
@@ -216,7 +220,7 @@ class Chair(Object):
     def resolveXCollision(self, player: CorePlayer) -> CorePlayer:
         if not pg.sprite.collide_mask(self, player):
             return player
-        if player.isSitting:
+        if player.isSitting and time.time() - player.timeSinceSatUp > player.satUpCoolDown:
             player.rect.center = self.rect.center
         elif player.satUp:
             player.rect.bottom = self.rect.top
